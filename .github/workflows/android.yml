@@ -29,6 +29,9 @@ jobs:
           cp script.js android-app/app/src/main/assets/
           cd android-app
           
+          # Обязательно даем права на выполнение gradle-обертке
+          chmod +x gradlew
+          
           # Выводим версию gradle для отладки
           ./gradlew -version
           
