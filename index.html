@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SINS AI // DARK GLASS ENGINE</title>
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- АДМИН-ПАНЕЛЬ -->
+    <div class="admin-modal" id="adminModal">
+        <div class="admin-content">
+            <div class="admin-header">
+                <div class="admin-title"><i class="fa-solid fa-shield-halved" style="color: var(--accent-color);"></i> SINS ADMIN // УПРАВЛЕНИЕ КЛЮЧАМИ</div>
+                <button class="admin-close" id="adminCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <!-- Секция генерации -->
+            <div class="admin-section">
+                <div class="admin-section-title"><i class="fa-solid fa-key"></i> Генерация разового ключа</div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <select id="adminKeyDuration" class="input-style" style="flex: 2; background: var(--bg-secondary); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 6px; padding: 0 10px; height: 38px;">
+                        <option value="1">1 день</option>
+                        <option value="7">7 дней</option>
+                        <option value="30" selected>30 дней</option>
+                        <option value="0">Навсегда</option>
+                    </select>
+                    <button class="btn-small" id="adminGenerateKeyBtn" style="flex: 3; background: var(--accent-color); height: 38px; font-weight: 600;"><i class="fa-solid fa-wand-magic-sparkles"></i> Выдать свободный ключ</button>
+                </div>
+                <div id="generatedKeyOutput" style="margin-top: 10px; font-family: monospace; color: #43b581; font-size: 0.95rem; word-break: break-all;"></div>
+            </div>
+
+            <!-- Секция статистики -->
+            <div class="admin-section">
+                <div class="admin-section-title"><i class="fa-solid fa-chart-line"></i> Статистика и активные пользователи</div>
+                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <div style="background: var(--bg-secondary); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-color); flex: 1;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Активные пользователи сейчас</div>
+                        <div id="activeUsersCount" style="font-size: 1.4rem; font-weight: bold; color: var(--accent-color);">0</div>
+                    </div>
+                    <div style="background: var(--bg-secondary); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-color); flex: 1;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Свободных ключей в базе</div>
+                        <div id="freeKeysCount" style="font-size: 1.4rem; font-weight: bold; color: #43b581;">1000</div>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">Список выданных активных ключей:</div>
+                <div style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px;">
+                    <table class="admin-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); text-align: left;">
+                                <th style="padding: 8px;">Ключ</th>
+                                <th style="padding: 8px;">Осталось времени</th>
+                                <th style="padding: 8px; text-align: right;">Действие</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminActiveKeysList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <div class="logo-title">
+                    <i class="fa-solid fa-terminal"></i> SINS AI
+                </div>
+                <button class="close-sidebar-btn" id="closeSidebarBtn">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <button class="new-chat-btn" id="newChatBtn">
+                <i class="fa-solid fa-plus"></i> Новый чат
+            </button>
+
+            <div class="chat-history-title">История диалогов</div>
+            <div class="chat-history-container" id="chatHistoryList"></div>
+
+            <div class="api-config">
+                <label><i class="fa-solid fa-key"></i> Введите SINS Ключ</label>
+                <input type="password" id="sinsApiKeyInput" class="input-style" placeholder="sins-...">
+            </div>
+
+            <div class="creator-badge" style="line-height: 1.4; font-size: 0.75rem;">
+                Разработчик: <span style="color: var(--accent-color);">man of motley</span><br>
+                Поддержка: <a href="https://t.me/myajx" target="_blank" style="color: #0088cc; text-decoration: none; font-weight: 600;">@myajx</a>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <button class="menu-toggle-btn" id="openSidebarBtn">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    
+                    <!-- Выпадающий список ИИ -->
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-brain" style="color: var(--accent-color);"></i>
+                        <select id="headerModelSelect" class="input-style" style="padding: 4px 8px; font-size: 0.8rem; height: 32px; background: var(--bg-secondary); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; max-width: 260px;">
+                            <option value="deepseek/deepseek-chat">deepseek/deepseek-chat</option>
+                            <option value="qwen/qwen-2.5-coder-32b-instruct">qwen/qwen-2.5-coder-32b-instruct</option>
+                        </select>
+                        <button id="refreshModelsBtn" class="btn-small" style="padding: 4px 8px; background: var(--bg-secondary); border: 1px solid var(--border-color);" title="Обновить список моделей в фоне"><i class="fa-solid fa-rotate"></i></button>
+                    </div>
+                </div>
+                
+                <button class="admin-open-btn" id="adminOpenBtn">
+                    <i class="fa-solid fa-lock"></i> Админка
+                </button>
+            </div>
+
+            <div class="chat-box" id="chatBox">
+                <button class="scroll-down-btn" id="scrollDownBtn" style="display: none;">
+                    <i class="fa-solid fa-arrow-down"></i> Вниз
+                </button>
+            </div>
+
+            <div class="input-area">
+                <div class="input-box">
+                    <textarea id="userInput" placeholder="Напишите сообщение..." rows="1"></textarea>
+                    <button class="send-btn" id="sendBtn">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script src="script.js"></script>
+</body>
+</html>
