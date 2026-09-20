@@ -21,11 +21,9 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
-      - name: Download WebView App Template
+      - name: Clone Public WebView Template & Insert Files
         run: |
-          curl -L https://github.com/mat-sz/android-webview-app/archive/refs/heads/main.zip -o app.zip
-          unzip -q app.zip
-          mv android-webview-app-main android-app
+          git clone https://github.com/mat-sz/android-webview-app.git android-app
           mkdir -p android-app/app/src/main/assets
           cp index.html android-app/app/src/main/assets/
           cp script.js android-app/app/src/main/assets/
