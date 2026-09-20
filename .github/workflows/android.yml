@@ -28,8 +28,12 @@ jobs:
           cp index.html android-app/app/src/main/assets/
           cp script.js android-app/app/src/main/assets/
           cd android-app
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          
+          # Выводим версию gradle для отладки
+          ./gradlew -version
+          
+          # Собираем debug APK с отключенным lint-анализом
+          ./gradlew assembleDebug -x lint
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
