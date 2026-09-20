@@ -21,14 +21,18 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
-      - name: Build with Gradle (Android)
+      - name: Download WebView App Template
         run: |
-          git clone https://github.com/mat-sz/android-webview-app.git android-app
+          curl -L https://github.com/mat-sz/android-webview-app/archive/refs/heads/main.zip -o app.zip
+          unzip -q app.zip
+          mv android-webview-app-main android-app
           mkdir -p android-app/app/src/main/assets
           cp index.html android-app/app/src/main/assets/
           cp script.js android-app/app/src/main/assets/
+
+      - name: Build with Gradle (Android)
+        run: |
           cd android-app
-          
           chmod +x gradlew
           ./gradlew assembleDebug -x lint
 
